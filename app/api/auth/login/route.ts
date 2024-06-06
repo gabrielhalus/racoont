@@ -7,19 +7,15 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   try {
     await connectMongo();
-    const { name, email, password }: loginDto = await req.json();
+    const { loginIdentifier, password }: loginDto = await req.json();
 
-    if (!name && !email) {
+    if (!loginIdentifier) {
       return NextResponse.json({ message: 'Either email or name is required' }, { status: 400 });
     }
 
-    let user: TUser | null;
-
-    if (email) {
-      user = await User.findOne({ email }).select('+password').lean();
-    } else {
-      user = await User.findOne({ name }).select('+password').lean();
-    }
+    let user: TUser | null = await User.findOne({ $or: [{ email: loginIdentifier }, { name: loginIdentifier }] })
+      .select('+password')
+      .lean();
 
     if (!user || !(await compare(password, user?.password as string))) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
