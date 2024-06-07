@@ -1,4 +1,4 @@
-import { InferSchemaType, Schema, model, models } from 'mongoose';
+import { InferSchemaType, Schema, Types, model, models } from 'mongoose';
 
 const SessionSchema = new Schema(
   {
@@ -14,14 +14,13 @@ const SessionSchema = new Schema(
     toJSON: {
       versionKey: false,
       virtuals: true,
-      transform: (_, ret) => {
-        delete ret._id;
-      },
     },
   },
 );
 
-export type TSession = InferSchemaType<typeof SessionSchema>;
+export type TSession = InferSchemaType<typeof SessionSchema> & {
+  _id: Types.ObjectId;
+};
 
 const Session = models.Session || model('Session', SessionSchema);
 export default Session;

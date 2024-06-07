@@ -1,4 +1,4 @@
-import { InferSchemaType, Schema, model, models } from 'mongoose';
+import { InferSchemaType, Schema, Types, model, models } from 'mongoose';
 
 const UserSchema = new Schema(
   {
@@ -11,14 +11,13 @@ const UserSchema = new Schema(
     toJSON: {
       versionKey: false,
       virtuals: true,
-      transform: (_, ret) => {
-        delete ret._id;
-      },
     },
   },
 );
 
-export type TUser = InferSchemaType<typeof UserSchema>;
+export type TUser = InferSchemaType<typeof UserSchema> & {
+  _id: Types.ObjectId;
+};
 
 const User = models.User || model('User', UserSchema);
 export default User;
