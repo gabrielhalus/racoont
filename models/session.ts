@@ -7,7 +7,6 @@ const SessionSchema = new Schema(
     email: { type: String, required: true, trim: true },
     token: { type: String, required: true },
     expires_at: { type: Date, required: true },
-    ip_address: { type: String, required: true },
   },
   {
     timestamps: true,
