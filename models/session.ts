@@ -9,7 +9,16 @@ const SessionSchema = new Schema(
     expires_at: { type: Date, required: true },
     ip_address: { type: String, required: true },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      versionKey: false,
+      virtuals: true,
+      transform: (_, ret) => {
+        delete ret._id;
+      },
+    },
+  },
 );
 
 export type TSession = InferSchemaType<typeof SessionSchema>;
