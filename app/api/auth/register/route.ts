@@ -1,7 +1,7 @@
 import { registerDto } from '@/dto/register.dto';
 import User from '@/models/user';
+import authenticateUser from '@/utils/authenticate-user';
 import connectMongo from '@/utils/connect-mongo';
-import { hash } from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -27,9 +27,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: `${missingFields.join(', ')} are required` }, { status: 400 });
     }
 
-    const user = await User.create({ name, email, password: await hash(password, 10) });
-    return NextResponse.json({ user, message: 'Authenticated' }, { status: 200 });
+    const user = await User.create({ name, email, password });
+
+    return await authenticateUser(user);
   } catch (error) {
-    return NextResponse.json({ message: error }, { status: 400 });
+    return NextResponse.json({ message: error }, { status: 500 });
   }
 }

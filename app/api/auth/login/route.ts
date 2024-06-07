@@ -1,7 +1,7 @@
 import { loginDto } from '@/dto/login.dto';
 import User, { TUser } from '@/models/user';
+import authenticateUser from '@/utils/authenticate-user';
 import connectMongo from '@/utils/connect-mongo';
-import { compare } from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -13,16 +13,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Either email or name is required' }, { status: 400 });
     }
 
-    let user: TUser | null = await User.findOne({ $or: [{ email: loginIdentifier }, { name: loginIdentifier }] })
-      .select('+password')
-      .lean();
+    let user: TUser | null = await User.findOne({ $or: [{ email: loginIdentifier }, { name: loginIdentifier }] }).populate('password');
 
-    if (!user || !(await compare(password, user?.password as string))) {
+    if (!user || !(await user.comparePassword(password))) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    return NextResponse.json({ user, message: 'Authenticated' }, { status: 200 });
+    return await authenticateUser(user);
   } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
