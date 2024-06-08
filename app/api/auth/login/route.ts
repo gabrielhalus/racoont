@@ -1,6 +1,6 @@
 import { loginDto } from '@/dto/login.dto';
 import User, { TUser } from '@/models/user';
-import authenticateUser from '@/utils/authenticate-user';
+import { authenticateUser } from '@/utils/authentication';
 import connectMongo from '@/utils/connect-mongo';
 import { NextRequest, NextResponse } from 'next/server';
 
